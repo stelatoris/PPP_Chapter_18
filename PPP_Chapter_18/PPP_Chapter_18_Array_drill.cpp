@@ -40,8 +40,6 @@ void int_array(int a[], int n)
 	delete[] p;
 }
 
-
-
 int main()
 {
 	for (int i = 0; i < 10; ++i) {
