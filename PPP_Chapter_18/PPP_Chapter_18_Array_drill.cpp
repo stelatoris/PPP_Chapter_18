@@ -25,7 +25,7 @@ void int_array(int a[], int n)
 		la[i] = a[i];
 	}
 	cout << "la: ";
-	print_array(la, 10);
+	print_array(la, n);
 
 	//3.d/e/f
 	int* p = new int[n];	
@@ -34,7 +34,7 @@ void int_array(int a[], int n)
 	}
 
 	cout << "p: ";
-	print_array(p, 10);
+	print_array(p, n);
 
 	//3.g
 	delete[] p;
@@ -42,25 +42,27 @@ void int_array(int a[], int n)
 
 int main()
 {
-	for (int i = 0; i < 10; ++i) {
+	const int n{ 10 };
+	
+	for (int i = 0; i < n; ++i) {
 		ga[i] = pow(2, i);
 	}	
 
 	//4.a
-	int_array(ga, 10);
+	int_array(ga, n);
 
 	//4.b
-	int aa[10] = { 1 };
+	int aa[n] = { 1 };
 	int sum{1};
-	for (int i = 1; i < 10; ++i) {
+	for (int i = 1; i < n; ++i) {
 		sum *= (i+1);
 		aa[i] = sum;
 	}
 
 	//print aa
 	cout << "aa: ";
-	print_array(aa, 10);
+	print_array(aa, n);
 
 	//4.c
-	int_array(aa, 10);
+	int_array(aa, n);
 }
