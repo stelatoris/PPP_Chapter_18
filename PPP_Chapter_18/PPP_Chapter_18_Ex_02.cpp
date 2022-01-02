@@ -11,32 +11,6 @@
 
 #include "std_lib_facilities.h"
 
-char* my_strdup(const char* cs)
-{
-	if (!cs) return nullptr;
-	
-	// find size of cs array
-	int n{};
-	while (*cs!=0) {
-		++cs;
-		++n;
-	}
-	cs -= n;		//go back to [0]
-
-	// copy array
-	char* t_cs = new char[n];
-	for (int i = 0; i < n; ++i) {
-		*t_cs = *cs;
-		++t_cs;		//use pointer arethmatic to move to next memory block
-		++cs;
-	}
-
-	*t_cs = 0;		//add terminating c_style string 0
-	cs -= n;		//go back to [0]
-	t_cs -= n;		//go back to [0]
-	return t_cs;
-}
-
 const char* findx(const char* s, const char* x)
 {
 	//find x in s
@@ -68,10 +42,6 @@ const char* findx(const char* s, const char* x)
 
 int main()
 {
-	char mystring[] = { "Hello me!" };
-
-	cout << my_strdup(mystring)<<'\n';
-
 	char my_string_s[] = { "C++ is hard to understand, but fun to learn." };
 	char my_string_x[] = { "hard to understand, but fun to learn." };
 	

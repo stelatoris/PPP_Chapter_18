@@ -6,8 +6,7 @@
 // ************************************************************************************
 //	1. Write a function, char* strdup(const char*), that copies a C - style string
 //	into memory it allocates on the free store.Do not use any standard library
-//	functions.Do not use subscripting; use the dereference operator *
-//	instead.
+//	functions.Do not use subscripting; use the dereference operator * instead.
 
 
 #include "std_lib_facilities.h"
