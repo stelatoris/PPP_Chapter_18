@@ -1,5 +1,9 @@
 // PPP_Chapter_18.cpp
 // 
+// Exercise solutions from the book:
+// ************************************************************************************
+// * Programming Principles and Practice Using C++, Second Edition, Bjarne Stroustrup *
+// ************************************************************************************
 //	1. Write a function, char* strdup(const char*), that copies a C - style string
 //	into memory it allocates on the free store.Do not use any standard library
 //	functions.Do not use subscripting; use the dereference operator *
