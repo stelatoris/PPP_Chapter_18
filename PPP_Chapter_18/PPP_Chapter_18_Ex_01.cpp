@@ -23,11 +23,8 @@ char* my_strdup(const char* cs)
 
 	// copy array
 	char* t_cs = new char[n];
-	for (int i = 0; i < n; ++i) {
-		*t_cs = *cs;
-		++t_cs;		//use pointer arethmatic to move to next memory block
-		++cs;
-	}
+
+	while (*cs) *t_cs++ = *cs++;	//use pointer arethmatic to move to next memory block
 
 	*t_cs = 0;		//add terminating c_style string 0
 	cs -= n;		//go back to [0]
