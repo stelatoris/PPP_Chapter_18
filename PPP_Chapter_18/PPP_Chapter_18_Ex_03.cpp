@@ -61,5 +61,4 @@ catch (std::exception& e) {
 catch (...) {
 	std::cerr << "exception\n";
 	return 2;
-
 }
