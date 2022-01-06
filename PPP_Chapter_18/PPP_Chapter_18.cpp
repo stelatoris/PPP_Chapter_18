@@ -4,74 +4,83 @@
 //	************************************************************************************
 //	* Programming Principles and Practice Using C++, Second Edition, Bjarne Stroustrup *
 //	************************************************************************************
-//  Chapter 18, exercise 09: write program that tells the order in which static
-//  storage, the stack and the free store are laid out. Does stack grow upward
-//  or downward? In an array on free store, are elements with higher indices
-//  allocated at higher or lower addresses?
+//  10. Look at the “array solution” to the palindrome problem in §18.7.2.Fix it
+//  to deal with long strings by(a) reporting if an input string was too long
+//  and (b)allowing an arbitrarily long string.Comment on the complexity
+//  of the two versions.
+//
+//  Had a tough time with understanding the idea behind the the buffer overflowing.
+//  Checked out others solutions and studied them.
 
+#pragma warning(disable : 4996)
 #include "std_lib_facilities.h"
 
-// static storage
-int static_1 = 0;
-int static_2 = 0;
-int static_3 = 0;
+bool is_palindrome(const char s[], int n)
+{
+    int first = 0;
+    int last = n - 1;
+    while (first < last) {
+        if (s[first] != s[last]) return false;
+        ++first;
+        --last;
+    }
+    return true;
+}
+
+istream& read_word(istream& is, char* buffer, int max)
+{
+    is.width(max);
+    is >> buffer;
+    if (strlen(buffer) == max - 1) {
+        cout << "Input string exeeded " << max << " characters!\n";
+        char c;
+        while (is.get(c)) {
+            if (c == '\n') break;
+        }
+    }
+    return is;
+}
+
+istream& read_long_word(istream& is, char*& buffer) {
+    int max = 256;
+    char* first_batch = new char[max];
+    *first_batch = 0;
+    char ch;
+    while (cin.get(ch)) {
+        if (ch == '\n') break;
+        if (strlen(first_batch) == max - 1) {
+            char* second_batch = new char[max];
+            strcpy(second_batch, first_batch);
+            delete[] first_batch;
+            max += max;
+            first_batch = new char[max];
+            strcpy(first_batch, second_batch);
+            delete[] second_batch;            
+        }
+        first_batch[strlen(first_batch) + 1] = 0;
+        first_batch[strlen(first_batch)] = ch;
+    }
+    buffer = first_batch;
+    return is;
+}
 
 int main()
-try {
-    // static storage
-    int* p_static_1 = &static_1;
-    int* p_static_2 = &static_2;
-    int* p_static_3 = &static_3;
-    cout << "Static storage:\n"
-        << "p_static_1: " << p_static_1 << " | " << int(reinterpret_cast<int*>(p_static_1)) << '\n'
-        << "p_static_2: " << p_static_2 << " | " << int(reinterpret_cast<int*>(p_static_2)) << '\n'
-        << "p_static_3: " << p_static_3 << " | " << int(reinterpret_cast<int*>(p_static_3)) << '\n';
-    cout << "\nStatic storage grows ";
-    if (p_static_2 > p_static_1) cout << "upwards\n";
-    else cout << "downwards\n";
-    cout << "-------------------------------------\n";
+try
+{
+    //constexpr int max = 128;
+    //for (char s[max]; read_word(cin, s, max); ) {
+    //    cout << s << " is";
+    //    if (!is_palindrome(s, strlen(s))) cout << " not";
+    //    cout << " a palindrome\n";
+    //}
 
-    // stack
-    int stack_1 = 0;
-    int stack_2 = 0;
-    int stack_3 = 0;
-
-    int* p_stack_1 = &stack_1;
-    int* p_stack_2 = &stack_2;
-    int* p_stack_3 = &stack_3;
-
-    cout << "Stack:\n"
-        << "p_stack_1: " << p_stack_1 << " | " << int(reinterpret_cast<int*>(p_stack_1)) << '\n'
-        << "p_stack_2: " << p_stack_2 << " | " << int(reinterpret_cast<int*>(p_stack_2)) << '\n'
-        << "p_stack_3: " << p_stack_3 << " | " << int(reinterpret_cast<int*>(p_stack_3)) << '\n';
-    cout << "\nStack grows ";
-    if (p_stack_2 > p_stack_1) cout << "upwards\n";
-    else cout << "downwards\n";
-    cout << "-------------------------------------\n";
-
-    // free store
-    int* freestore_1 = new int(0);
-    int* freestore_2 = new int(0);
-    int* freestore_3 = new int(0);
-    cout << "Free store:\n"
-        << "freestore_1: " << freestore_1 << " | " << int(reinterpret_cast<int*>(freestore_1)) << '\n'
-        << "freestore_2: " << freestore_2 << " | " << int(reinterpret_cast<int*>(freestore_2)) << '\n'
-        << "freestore_3: " << freestore_3 << " | " << int(reinterpret_cast<int*>(freestore_3)) << '\n';
-    cout << "\nFree store grows ";
-    if (freestore_2 > freestore_1) cout << "upwards\n";
-    else cout << "downwards\n";
-    cout << "-------------------------------------\n";
-
-    // array on free store
-    int* free_array = new int[] {1, 2, 3, 4, 5};
-    cout << "Array on free store:\n"
-        << "free_array[0]: " << free_array[0] << " | " << int(reinterpret_cast<int*>(free_array[0])) << '\n'
-        << "free_array[1]: " << free_array[1] << " | " << int(reinterpret_cast<int*>(free_array[1])) << '\n'
-        << "free_array[2]: " << free_array[2] << " | " << int(reinterpret_cast<int*>(free_array[2])) << '\n';
-    cout << "\nFree store grows ";
-    if (free_array[1] > free_array[0]) cout << "upwards\n";
-    else cout << "downwards\n";
+    for (char* s=0; read_long_word(cin, s); ) {
+        cout << s << " is";
+        if (!is_palindrome(s, strlen(s))) cout << " not";
+        cout << " a palindrome\n";
+    }
 }
+
 catch (exception& e) {
     cerr << "exception: " << e.what() << endl;
 }
