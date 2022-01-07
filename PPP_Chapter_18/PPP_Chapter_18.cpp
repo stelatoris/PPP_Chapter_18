@@ -25,7 +25,7 @@ public:
     Skip_list* insert(Skip_list* n);
 
     // add new entry n after p, above q
-    Skip_list* insert_After_Above(Skip_list* p, Skip_list* q, Skip_list* n);
+    //Skip_list* insert_After_Above(Skip_list* p, Skip_list* q, Skip_list* n);
 
     Skip_list* prev;
     Skip_list* succ;
@@ -52,15 +52,20 @@ Skip_list::Skip_list()
 {
     succ = max;
     succ->prev = this;
+    succ->min = this;
 }
 
 Skip_list* Skip_list::search(const string& v)
 {
-    Skip_list* p = min;
+    Skip_list* p;
+    if (!prev) p = this;
+    else p = min;
+
     while (p->below) {
         p = p->below;
-        while (v >= succ->value) p =p->succ;                  
+                          
     }
+    while (p->succ->value <= v) p = p->succ;
     return p;
 }
 
@@ -69,19 +74,25 @@ Skip_list* Skip_list::insert(Skip_list* n)
     if (!n) return nullptr;
 
     Skip_list* p = search(n->value);
-    Skip_list* q = nullptr;
-    int i = -1;
-
-}
-
-
-Skip_list* Skip_list::insert_After_Above(Skip_list* p, Skip_list* q, Skip_list* n)
-// add new entry n after p, above q
-{
     n->prev = p;
+    n->succ = p->succ;
+    
+    n->max = p->max;
+    n->min = max->min;
+    n->h = p->h;
+    p->succ->prev = n;
     p->succ = n;
-
+    return n;
 }
+
+
+//Skip_list* Skip_list::insert_After_Above(Skip_list* p, Skip_list* q, Skip_list* n)
+//// add new entry n after p, above q
+//{
+//    n->prev = p;
+//    p->succ = n;
+//
+//}
 
 
 
@@ -89,9 +100,22 @@ int main()
 try
 {
     Skip_list* list1 = new Skip_list;
+    list1 = list1->insert(new Skip_list{ "Sierra" });
+    list1 = list1->insert(new Skip_list{ "Mike" });
+    list1 = list1->insert(new Skip_list{ "Alpha" });
+    list1 = list1->insert(new Skip_list{ "Zulu" });
+    list1 = list1->insert(new Skip_list{ "Delta" });
+    list1 = list1->insert(new Skip_list{ "Beta" });
+    list1 = list1->insert(new Skip_list{ "Golf" });
+    list1 = list1->insert(new Skip_list{ "Charlie" });
 
-    cout << "min value: " << list1->value << '\n';
-    cout << "max value: " << list1->max->value << '\n';
+
+
+    while (list1->prev) list1 = list1->prev;
+    while (list1) {
+        cout << "Value: "<<list1->value << '\n';
+        list1 = list1->succ;
+    }
 
 }
 
