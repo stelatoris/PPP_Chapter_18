@@ -22,6 +22,10 @@ public:
     Skip_list();    // initializes list with min and max
 
     Skip_list* search(const string& v);
+    Skip_list* insert(Skip_list* n);
+
+    // add new entry n after p, above q
+    Skip_list* insert_After_Above(Skip_list* p, Skip_list* q, Skip_list* n);
 
     Skip_list* prev;
     Skip_list* succ;
@@ -29,6 +33,7 @@ public:
     Skip_list* below;
     Skip_list* min;
     Skip_list* max;
+    int h;  // tower height
 };
 
 Skip_list::Skip_list(const string& v,
@@ -42,9 +47,11 @@ Skip_list::Skip_list(const string& v,
 Skip_list::Skip_list()
     : value{ 0 }, min{ nullptr },
     max{ new Skip_list{"~~~~~~~~~~~~~~~~~~~~~~~~~~~~"} },
-    prev{ nullptr }, succ{ max },
+    prev{ nullptr }, succ{ nullptr },
     above{ nullptr }, below{ nullptr }
 {
+    succ = max;
+    succ->prev = this;
 }
 
 Skip_list* Skip_list::search(const string& v)
@@ -56,6 +63,27 @@ Skip_list* Skip_list::search(const string& v)
     }
     return p;
 }
+
+Skip_list* Skip_list::insert(Skip_list* n)
+{
+    if (!n) return nullptr;
+
+    Skip_list* p = search(n->value);
+    Skip_list* q = nullptr;
+    int i = -1;
+
+}
+
+
+Skip_list* Skip_list::insert_After_Above(Skip_list* p, Skip_list* q, Skip_list* n)
+// add new entry n after p, above q
+{
+    n->prev = p;
+    p->succ = n;
+
+}
+
+
 
 int main()
 try
