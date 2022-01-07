@@ -4,81 +4,67 @@
 //	************************************************************************************
 //	* Programming Principles and Practice Using C++, Second Edition, Bjarne Stroustrup *
 //	************************************************************************************
-//  10. Look at the “array solution” to the palindrome problem in §18.7.2.Fix it
-//  to deal with long strings by(a) reporting if an input string was too long
-//  and (b)allowing an arbitrarily long string.Comment on the complexity
-//  of the two versions.
-//
-//  Had a tough time with understanding the idea behind the the buffer overflowing.
-//  Checked out others solutions and studied them.
+//  11. Look up(e.g., on the web) skip list and implement that kind of list.This is
+//  not an easy exercise.
 
-#pragma warning(disable : 4996)
 #include "std_lib_facilities.h"
 
-bool is_palindrome(const char s[], int n)
-{
-    int first = 0;
-    int last = n - 1;
-    while (first < last) {
-        if (s[first] != s[last]) return false;
-        ++first;
-        --last;
-    }
-    return true;
+class Skip_list {
+public:
+    string value;
+
+    // with value
+    Skip_list(const string& v,
+        Skip_list* p, Skip_list* s,
+        Skip_list* a, Skip_list* b,
+        Skip_list* min, Skip_list* max);
+
+    Skip_list();    // initializes list with min and max
+
+    Skip_list* search(const string& v);
+
+    Skip_list* prev;
+    Skip_list* succ;
+    Skip_list* above;
+    Skip_list* below;
+    Skip_list* min;
+    Skip_list* max;
+};
+
+Skip_list::Skip_list(const string& v,
+    Skip_list* p = nullptr, Skip_list* s = nullptr,
+    Skip_list* a = nullptr, Skip_list* b = nullptr,
+    Skip_list* min = nullptr, Skip_list* max = nullptr)
+    : value{ v }, prev{ p }, succ{ s }, above{ a }, below{ b } 
+{       
 }
 
-istream& read_word(istream& is, char* buffer, int max)
+Skip_list::Skip_list()
+    : value{ 0 }, min{ nullptr },
+    max{ new Skip_list{"~~~~~~~~~~~~~~~~~~~~~~~~~~~~"} },
+    prev{ nullptr }, succ{ max },
+    above{ nullptr }, below{ nullptr }
 {
-    is.width(max);
-    is >> buffer;
-    if (strlen(buffer) == max - 1) {
-        cout << "Input string exeeded " << max << " characters!\n";
-        char c;
-        while (is.get(c)) {
-            if (c == '\n') break;
-        }
-    }
-    return is;
 }
 
-istream& read_long_word(istream& is, char*& buffer) {
-    int max = 256;
-    char* first_batch = new char[max];
-    *first_batch = 0;
-    char ch;
-    while (cin.get(ch)) {
-        if (ch == '\n') break;
-        if (strlen(first_batch) == max - 1) {
-            char* second_batch = new char[max];
-            strcpy(second_batch, first_batch);
-            delete[] first_batch;
-            max += max;
-            first_batch = new char[max];
-            strcpy(first_batch, second_batch);
-            delete[] second_batch;            
-        }
-        first_batch[strlen(first_batch) + 1] = 0;
-        first_batch[strlen(first_batch)] = ch;
+Skip_list* Skip_list::search(const string& v)
+{
+    Skip_list* p = min;
+    while (p->below) {
+        p = p->below;
+        while (v >= succ->value) p =p->succ;                  
     }
-    buffer = first_batch;
-    return is;
+    return p;
 }
 
 int main()
 try
 {
-    //constexpr int max = 128;
-    //for (char s[max]; read_word(cin, s, max); ) {
-    //    cout << s << " is";
-    //    if (!is_palindrome(s, strlen(s))) cout << " not";
-    //    cout << " a palindrome\n";
-    //}
+    Skip_list* list1 = new Skip_list;
 
-    for (char* s=0; read_long_word(cin, s); ) {
-        cout << s << " is";
-        if (!is_palindrome(s, strlen(s))) cout << " not";
-        cout << " a palindrome\n";
-    }
+    cout << "min value: " << list1->value << '\n';
+    cout << "max value: " << list1->max->value << '\n';
+
 }
 
 catch (exception& e) {
