@@ -7,6 +7,9 @@
 //  11. Look up(e.g., on the web) skip list and implement that kind of list.This is
 //  not an easy exercise.
 
+
+
+#include<time.h>
 #include "std_lib_facilities.h"
 
 class Skip_list {
@@ -34,6 +37,9 @@ public:
     Skip_list* min;
     Skip_list* max;
     int h;  // tower height
+
+private:
+    bool coin_flip();
 };
 
 Skip_list::Skip_list(const string& v,
@@ -65,7 +71,7 @@ Skip_list* Skip_list::search(const string& v)
         p = p->below;
                           
     }
-    while (p->succ->value <= v) p = p->succ;
+    while (p->succ->value <= v) p = p->succ;    // traverse forward till v is less or equal than value
     return p;
 }
 
@@ -74,15 +80,29 @@ Skip_list* Skip_list::insert(Skip_list* n)
     if (!n) return nullptr;
 
     Skip_list* p = search(n->value);
+    //insert on lowest level
     n->prev = p;
-    n->succ = p->succ;
-    
+    n->succ = p->succ;    
     n->max = p->max;
     n->min = max->min;
     n->h = p->h;
     p->succ->prev = n;
     p->succ = n;
+
+   
+    while (coin_flip()) {         // even or odd?
+     
+    }
+
     return n;
+}
+
+bool Skip_list::coin_flip()
+//generate random number: return 1 if odd(tails), and 2 if even(heads)
+{    
+    int coin = (rand() % 2) + 1;    // generate random number
+    if (coin % 2 == 1) return 0;    // if odd number (tails)
+    else return 1;                  // if even number (heads)
 }
 
 
@@ -99,7 +119,8 @@ Skip_list* Skip_list::insert(Skip_list* n)
 int main()
 try
 {
-    Skip_list* list1 = new Skip_list;
+    srand(time(NULL));
+    /*Skip_list* list1 = new Skip_list;
     list1 = list1->insert(new Skip_list{ "Sierra" });
     list1 = list1->insert(new Skip_list{ "Mike" });
     list1 = list1->insert(new Skip_list{ "Alpha" });
@@ -108,6 +129,9 @@ try
     list1 = list1->insert(new Skip_list{ "Beta" });
     list1 = list1->insert(new Skip_list{ "Golf" });
     list1 = list1->insert(new Skip_list{ "Charlie" });
+    list1 = list1->search("Beta");
+    cout << "Search result is " << list1->value << '\n';
+    list1 = list1->insert(new Skip_list{ "Foxtrot" });
 
 
 
@@ -115,7 +139,10 @@ try
     while (list1) {
         cout << "Value: "<<list1->value << '\n';
         list1 = list1->succ;
-    }
+    }*/
+
+
+    
 
 }
 
