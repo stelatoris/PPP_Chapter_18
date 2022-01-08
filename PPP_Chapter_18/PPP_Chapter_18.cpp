@@ -25,10 +25,12 @@ public:
     Skip_list();    // initializes list with min and max
 
     Skip_list* search(const string& v);
+    Skip_list* search_lvl(const string& v);
     Skip_list* insert(Skip_list* n);
+    double size() const { return *sz; }
 
     // add new entry n after p, above q
-    //Skip_list* insert_After_Above(Skip_list* p, Skip_list* q, Skip_list* n);
+    Skip_list* insert_Above(Skip_list* p, Skip_list* q, Skip_list* n);
 
     Skip_list* prev;
     Skip_list* succ;
@@ -36,18 +38,20 @@ public:
     Skip_list* below;
     Skip_list* min;
     Skip_list* max;
-    int h;  // tower height
+    int* height;    // tower height
+    
 
 private:
-    bool coin_flip();
+    double* sz;     // size of list
+    bool coin_flip();   //generate even or odd number to expand tower or not
 };
 
 Skip_list::Skip_list(const string& v,
     Skip_list* p = nullptr, Skip_list* s = nullptr,
     Skip_list* a = nullptr, Skip_list* b = nullptr,
     Skip_list* min = nullptr, Skip_list* max = nullptr)
-    : value{ v }, prev{ p }, succ{ s }, above{ a }, below{ b } 
-{       
+    : value{ v }, prev{ p }, succ{ s }, above{ a }, below{ b }
+{ 
 }
 
 Skip_list::Skip_list()
@@ -55,22 +59,38 @@ Skip_list::Skip_list()
     max{ new Skip_list{"~~~~~~~~~~~~~~~~~~~~~~~~~~~~"} },
     prev{ nullptr }, succ{ nullptr },
     above{ nullptr }, below{ nullptr }
+    , height{ nullptr }, sz{ nullptr }
 {
     succ = max;
     succ->prev = this;
     succ->min = this;
+    sz = new double{ 0 };
+    height = new int{ 0 };
+    max->height = height;
+    max->sz = sz; //list size
 }
 
-Skip_list* Skip_list::search(const string& v)
+Skip_list* Skip_list::search(const string& v)   
 {
     Skip_list* p;
     if (!prev) p = this;
     else p = min;
 
-    while (p->below) {
-        p = p->below;
-                          
+    while (p->below) {  //go to lowest level
+        p = p->below;                          
     }
+    
+    //!!!
+    p = p->search_lvl(v);   // traverse forward till v is less or equal than value
+    return p;
+}
+
+Skip_list* Skip_list::search_lvl(const string& v)
+{
+    Skip_list* p;
+    if (!prev) p = this;
+    else p = min;
+
     while (p->succ->value <= v) p = p->succ;    // traverse forward till v is less or equal than value
     return p;
 }
@@ -79,19 +99,37 @@ Skip_list* Skip_list::insert(Skip_list* n)
 {
     if (!n) return nullptr;
 
+    Skip_list* s = max->min; //s is start node of list on each level
     Skip_list* p = search(n->value);
     //insert on lowest level
     n->prev = p;
     n->succ = p->succ;    
     n->max = p->max;
-    n->min = max->min;
-    n->h = p->h;
+    n->min = max->min;    
     p->succ->prev = n;
     p->succ = n;
 
+    n->height = p->height;
+    n->sz = p->sz;
+
+    *sz += 1;
+    Skip_list* q = n;
+    int i = -1;
    
     while (coin_flip()) {         // even or odd?
-     
+        ++i;
+        if (i >= *height) {       // add a new level with -inf(min) and +inf(max)
+            *height += 1;            
+            Skip_list* new_min = new Skip_list{ min->value };
+            Skip_list* new_max = new Skip_list{ max->value };
+            new_min->below = min;
+            new_min->succ = new_max;
+            new_max->prev = new_min;
+            new_max->below = max;
+            min->above = new_min;
+            max->above = new_max;            
+        }
+        n = insert_Above(p, q, n);
     }
 
     return n;
@@ -106,13 +144,29 @@ bool Skip_list::coin_flip()
 }
 
 
-//Skip_list* Skip_list::insert_After_Above(Skip_list* p, Skip_list* q, Skip_list* n)
-//// add new entry n after p, above q
-//{
-//    n->prev = p;
-//    p->succ = n;
-//
-//}
+Skip_list* Skip_list::insert_Above(Skip_list* p, Skip_list* q, Skip_list* n)
+// add new entry n after p, above q
+{
+    //while (q->above) q = q->above;  
+    while (!p->above) {
+        if(p->prev) p = p->prev;
+    }        
+    p = p->above;
+
+    Skip_list* temp = new Skip_list{ n->value };
+    temp->below = q;
+    q->above = temp;
+    temp->prev = p;
+    temp->succ = p->succ;
+    p->succ->prev = temp;
+    p->succ = temp;
+    temp->max = max; // !!!!!!!  takes lvl 0 max and min. fix it please.
+    temp->min = max->min;
+    
+    temp->height = n->height;
+    temp->sz = n->sz;
+    return temp;
+}
 
 
 
@@ -120,7 +174,7 @@ int main()
 try
 {
     srand(time(NULL));
-    /*Skip_list* list1 = new Skip_list;
+    Skip_list* list1 = new Skip_list;
     list1 = list1->insert(new Skip_list{ "Sierra" });
     list1 = list1->insert(new Skip_list{ "Mike" });
     list1 = list1->insert(new Skip_list{ "Alpha" });
@@ -138,8 +192,9 @@ try
     while (list1->prev) list1 = list1->prev;
     while (list1) {
         cout << "Value: "<<list1->value << '\n';
+        cout << "height: " << *list1->height << " ,size: " << list1->size() << '\n';
         list1 = list1->succ;
-    }*/
+    }
 
 
     
