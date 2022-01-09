@@ -30,7 +30,7 @@ public:
     double size() const { return *sz; }
 
     // add new entry n after p, above q
-    Skip_list* insert_Above(Skip_list* p, Skip_list* q, Skip_list* n);
+    Skip_list* insert_Above(Skip_list* s, Skip_list* p, Skip_list* q, Skip_list* n);
 
     Skip_list* prev;
     Skip_list* succ;
@@ -39,6 +39,7 @@ public:
     Skip_list* min;
     Skip_list* max;
     int* height;    // tower height
+    int* t_height;
     
 
 private:
@@ -50,7 +51,7 @@ Skip_list::Skip_list(const string& v,
     Skip_list* p = nullptr, Skip_list* s = nullptr,
     Skip_list* a = nullptr, Skip_list* b = nullptr,
     Skip_list* min = nullptr, Skip_list* max = nullptr)
-    : value{ v }, prev{ p }, succ{ s }, above{ a }, below{ b }
+    : value{ v }, prev{ p }, succ{ s }, above{ a }, below{ b }, t_height{ new int{0} }
 { 
 }
 
@@ -68,6 +69,7 @@ Skip_list::Skip_list()
     height = new int{ 0 };
     max->height = height;
     max->sz = sz; //list size
+    t_height = height;
 }
 
 Skip_list* Skip_list::search(const string& v)   
@@ -110,26 +112,38 @@ Skip_list* Skip_list::insert(Skip_list* n)
     p->succ = n;
 
     n->height = p->height;
+    *n->t_height += 1;
     n->sz = p->sz;
 
     *sz += 1;
+    
     Skip_list* q = n;
     int i = -1;
    
     while (coin_flip()) {         // even or odd?
         ++i;
+        //Skip_list* new_s{ nullptr };
         if (i >= *height) {       // add a new level with -inf(min) and +inf(max)
             *height += 1;            
-            Skip_list* new_min = new Skip_list{ min->value };
-            Skip_list* new_max = new Skip_list{ max->value };
-            new_min->below = min;
+            Skip_list* new_min = new Skip_list{ n->min->value };
+            Skip_list* new_max = new Skip_list{ n->max->value };
+
+            new_min->max = new_max;
+            new_min->below = s;
             new_min->succ = new_max;
+            *new_min->t_height += 1;     // for testing
+
+            new_max->min = new_min;
             new_max->prev = new_min;
-            new_max->below = max;
-            min->above = new_min;
-            max->above = new_max;            
+            new_max->below = s->max;
+            *new_max->t_height += 1;     // for testing
+
+            s->above = new_min;
+            s->max->above = new_max;           
+            
+            s = new_min;            
         }
-        n = insert_Above(p, q, n);
+        n = insert_Above(s, p, q, n);
     }
 
     return n;
@@ -144,26 +158,37 @@ bool Skip_list::coin_flip()
 }
 
 
-Skip_list* Skip_list::insert_Above(Skip_list* p, Skip_list* q, Skip_list* n)
+Skip_list* Skip_list::insert_Above(Skip_list* s, Skip_list* p, Skip_list* q, Skip_list* n)
 // add new entry n after p, above q
 {
     //while (q->above) q = q->above;  
     while (!p->above) {
         if(p->prev) p = p->prev;
-    }        
-    p = p->above;
+    }
+
+    //if p is less than S height-1
+    if (!p->prev) {     
+        while (p->above) p = p->above;
+    }
+    else p = p->above;
+    
 
     Skip_list* temp = new Skip_list{ n->value };
+
+    // extend tower q upwards
     temp->below = q;
     q->above = temp;
     temp->prev = p;
     temp->succ = p->succ;
     p->succ->prev = temp;
     p->succ = temp;
-    temp->max = max; // !!!!!!!  takes lvl 0 max and min. fix it please.
-    temp->min = max->min;
+    temp->min = s;
+    temp->max = s->max; // !!!!!!!  takes lvl 0 max and min. fix it please.
+    
     
     temp->height = n->height;
+    temp->t_height = n->t_height;
+    *temp->t_height += 1;
     temp->sz = n->sz;
     return temp;
 }
