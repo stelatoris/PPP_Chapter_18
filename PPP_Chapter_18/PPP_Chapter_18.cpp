@@ -7,8 +7,6 @@
 //  11. Look up(e.g., on the web) skip list and implement that kind of list.This is
 //  not an easy exercise.
 
-
-
 #include<time.h>
 #include "std_lib_facilities.h"
 
@@ -16,21 +14,15 @@ class Skip_list {
 public:
     string value;
 
-    // with value
     Skip_list(const string& v,
         Skip_list* p, Skip_list* s,
         Skip_list* a, Skip_list* b,
         Skip_list* min, Skip_list* max,
         Skip_list* start );
 
-    Skip_list();    // initializes list with min and max
+    Skip_list();    // initializes empty list with min and max towers only
 
-    Skip_list* skip_search(const string& v);    
-    Skip_list* skip_insert(const string& v);
-
-    // add new entry n after p, above q
-    Skip_list* insert_Above(Skip_list* p, Skip_list* q, const string& v);
-
+    // links
     Skip_list* prev;
     Skip_list* succ;
     Skip_list* above;
@@ -38,15 +30,22 @@ public:
     Skip_list* min;
     Skip_list* max;
     Skip_list* start;
-    int* height;    // tower height
-    int* t_height;
+
+    Skip_list* skip_search(const string& v);    
+    Skip_list* skip_insert(const string& v);
+    int get_height() const { return *height; }
     
 private:
-    //double* sz;     // size of list
+    int* height;    // tower height
+    int* t_height;
+
     bool coin_flip();   //generate even or odd number to expand tower or not
     Skip_list* insert_after(Skip_list* p, const string& v);
     Skip_list* search_lvl(Skip_list* p, const string& v);
     Skip_list* init_new_lvl(Skip_list* p);  //adds new empty level with min and max
+
+    // add new entry n after p, above q
+    Skip_list* insert_Above(Skip_list* p, Skip_list* q, const string& v);
 };
 
 Skip_list::Skip_list(const string& v,
@@ -104,7 +103,6 @@ Skip_list* Skip_list::search_lvl(Skip_list* p, const string& v)
 Skip_list* Skip_list::init_new_lvl(Skip_list* s)
 // creates new empty level with min and max to extend entry tower heights 
 {
-    
     Skip_list* new_min = new Skip_list{ "1"};    //min possible number?
     Skip_list* new_max = new Skip_list{ "~~~~~~~~~~~~~~~~~~~~~~~~~~~~" };   //max possible number?
 
@@ -149,8 +147,7 @@ Skip_list* Skip_list::skip_insert(const string& v)
     Skip_list* q = nullptr;
     q = insert_after(p, v); // insert new value v after p
     
-    int i = -1;
-   
+    int i = -1;   
     while (coin_flip()) {         // even or odd?
         ++i;
        
@@ -175,7 +172,6 @@ Skip_list* Skip_list::insert_after(Skip_list* p, const string& v)
     n->min = p->max->min; //min->min is nullptr so we use max->min
     p->succ->prev = n;
     p->succ = n;
-
 
     n->height = p->height;
     n->start = p->start->start;
@@ -247,11 +243,18 @@ void print_skip_list(Skip_list* list)
     cout << "-End of Skip List-";
 }
 
+void fill_list(ifstream& ist, Skip_list* l)
+{
+    for (string s; ist >> s;) l = l->skip_insert(s);
+    if (ist.eof()) return;
+}
+
 int main()
 try
 {
     srand(time(NULL));
     Skip_list* list1 = new Skip_list;
+
     list1 = list1->skip_insert("Beta");
     list1 = list1->skip_insert("Delta");
     list1 = list1->skip_insert("Alpha");
@@ -261,7 +264,14 @@ try
     list1 = list1->skip_insert("Sierra");
     list1 = list1->skip_insert("Echo");
 
+    //string name{ "data_input.txt" };
+    //ifstream ist{ name };
+    //if (!ist)error("can't open input file", name);
+
+    //fill_list(ist, list1);
+
     print_skip_list(list1);
+    cout << "Maximum tower height"<<list1->get_height() << '\n';
 }
 
 catch (exception& e) {
